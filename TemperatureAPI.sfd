@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<ScriptFunctionDefinition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Version Major="1" Minor="0" />
+  <Name>TemperatureAPI</Name>
+  <Script># Import required libraries
+import requests
+import pandas as pd 
+import datetime
+
+# Lists of latitudes and longitudes
+lat 
+lon  
+
+# Your API key
+api_key = "762e06ca1b8bfb13af5c2cac28d8bed0"
+
+# List to store all the results
+all_data = []
+
+# Loop over latitude and longitude pairs
+for la, lo in zip(lat, lon):
+    # Construct API URL
+    url = f"https://api.openweathermap.org/data/2.5/forecast?lat={la}&amp;lon={lo}&amp;appid={api_key}&amp;units=metric"
+    
+    try:
+        # Fetch data
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+
+        # Extract data for each timestamp
+        timezone_offset = data['city']['timezone']    
+        sunrise = datetime.datetime.utcfromtimestamp(data['city']['sunrise']+timezone_offset)
+        sunset = datetime.datetime.utcfromtimestamp(data['city']['sunset']+timezone_offset)
+        for item in data['list']:
+            temperature = item['main']['temp']
+            humidity = item['main']['humidity']
+            feels_like=item['main']['feels_like']
+            temp_min=item['main']['temp_min']
+            temp_max=item['main']['temp_max']
+            wind_speed=item['wind']['speed']
+            deg=item['wind']['deg']
+            gust=item['wind']['gust']
+            perc=(item.get('rain', {}).get('3h', 0))
+            weather_desc=item['weather'][0]['description']
+            pressure = item['main']['pressure']
+            
+            visibility = item['visibility']
+            dt_txt = pd.to_datetime(item['dt'],unit='s')  # timestamp
+            all_data.append({
+                'Latitude': la,
+                'Longitude': lo,
+                'Timestamp': dt_txt,
+                'Temperature': temperature,
+                'Humidity': humidity,
+                'Feels_like':feels_like,
+                'Pressure':pressure,
+                'weather_desc':weather_desc,
+                'Gust':gust,
+                'Wind_speed':wind_speed,
+                'Temp_max':temp_max,
+                'Temp_min':temp_min,
+                'Visibility':visibility,
+                'Wind degree':deg,
+                'Percipitation':perc,
+                'Sunrise':sunrise,
+                'Sunset':sunset
+            })
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching data for lat={la}, lon={lo}: {e}")
+
+
+
+df = pd.DataFrame(all_data)
+# Define output for Spotfire
+# SPOTFIRE_OUTPUT
+output = df</Script>
+  <Language>Python</Language>
+  <Input>
+    <Name>lat</Name>
+    <Type>Column</Type>
+    <DisplayName>lat</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+    <AllowedDataType>Long</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>lon</Name>
+    <Type>Column</Type>
+    <DisplayName>lon</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+    <AllowedDataType>Long</AllowedDataType>
+  </Input>
+  <Output>
+    <Name>output</Name>
+    <Type>Table</Type>
+    <DisplayName>output</DisplayName>
+    <Description />
+  </Output>
+  <Description />
+  <AllowCaching>false</AllowCaching>
+  <ApprovalStamp>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAAIq89t7N5kCviLOkxSWqqgAAAAACAAAAAAAQZgAAAAEAACAAAADg/A7hAkHsoJc3Nb6K3YE0dUXyOBpjpoUnBTZNfkL1WQAAAAAOgAAAAAIAACAAAAC+sTZNfiSWvBNobRrnbzA73DAOcfNCuegQiWMX41da95AAAAC3iWf1+pqCeB74ryAzu478pXov0DF1jP4ib6npvVlHBP+y1wVErkGD+VsrpCRh6TbjFG0/ylCje1phq0bHAz+E63Ys5V8L0mEZPYgLNfpWrSefVgwiaLcxnme3vjyFyX9Fv0bst8i03AsYUxfphKPLQjMVVPbI0FZeHzxAAM83zCNZtY5B6KPssBTgj16e7ipAAAAAcLFw1iukYjH3+Jl95tq/9hFsoiazNgoeQ3JHyU86PgIfKH9YV4gBubnZL01ZI2ug2Xs8lWfJoaE0DkpjwywnQg==</ApprovalStamp>
+  <AdditionalApprovalStamps />
+  <Category>default</Category>
+</ScriptFunctionDefinition>

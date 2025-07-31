@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<ScriptFunctionDefinition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Version Major="1" Minor="0" />
+  <Name>K-means</Name>
+  <Script>import pandas as pd
+from sklearn.cluster import KMeans
+
+input_copy = input_df
+
+data = input_df.to_numpy()
+    
+km = KMeans(
+        n_clusters = n_clusters, 
+        init = init,
+        n_init = n_init, 
+        max_iter = max_iter, 
+        tol= tol, 
+        random_state = random_state
+        )
+		
+input_copy['labels'] = km.fit_predict(data)
+
+final_df = input_copy</Script>
+  <Language>Python</Language>
+  <Input>
+    <Name>input_df</Name>
+    <Type>Table</Type>
+    <DisplayName>input_df</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+    <AllowedDataType>Long</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>n_clusters</Name>
+    <Type>Value</Type>
+    <DisplayName>n_clusters</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+    <AllowedDataType>Long</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>init</Name>
+    <Type>Value</Type>
+    <DisplayName>init</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+    <AllowedDataType>Long</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>n_init</Name>
+    <Type>Value</Type>
+    <DisplayName>n_init</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+    <AllowedDataType>Long</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>max_iter</Name>
+    <Type>Value</Type>
+    <DisplayName>max_iter</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+    <AllowedDataType>Long</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>tol</Name>
+    <Type>Value</Type>
+    <DisplayName>tol</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+    <AllowedDataType>Long</AllowedDataType>
+  </Input>
+  <Input>
+    <Name>random_state</Name>
+    <Type>Value</Type>
+    <DisplayName>randon_state</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+    <AllowedDataType>Long</AllowedDataType>
+  </Input>
+  <Output>
+    <Name>final_df</Name>
+    <Type>Table</Type>
+    <DisplayName>final_df</DisplayName>
+    <Description />
+  </Output>
+  <Description />
+  <ApprovalStamp>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAAIq89t7N5kCviLOkxSWqqgAAAAACAAAAAAAQZgAAAAEAACAAAABLTD/dHohB69itMgzr1xq5mLQN1RwFWlhBX1l02VDCSgAAAAAOgAAAAAIAACAAAACHgKb6GvsCEzORHRyGaT6Ni9WOS1Wx052gGdu7TeKSTpAAAAA0nswSECieUKIo8bWcLQOC1mTgiocFqu9YdZCPlhulxEISxP5Rth99nDeVDhwP34aH0Y7/SZ8yeHYRU0hLvJu/LAC7/8p3um0JbEKnr8lBltUGqqrKnM5nQt3FWKQvLQz266pl1pNljO8Qu0ct3RNrBXRCuzf7xzeUuC1rbVcdlkQ6WW8lf7vn4yQLynL3fKFAAAAAoD74UTIENlMG18PcNH/Tyz9ald7fF8lxttCgXEMKJjrFL5Uqxxx/HbqOIduZmwFUmj4UtnD4pzL5uT7nsMLgIg==</ApprovalStamp>
+  <AdditionalApprovalStamps />
+  <Category>default</Category>
+</ScriptFunctionDefinition>

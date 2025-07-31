@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<ScriptFunctionDefinition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Version Major="1" Minor="0" />
+  <Name>Covid19</Name>
+  <Script>import requests
+import pandas as pd
+
+# API endpoint
+url = "https://api.rootnet.in/covid19-in/stats/history"
+
+# Get response and parse JSON
+response = requests.get(url)
+data = response.json()
+
+# Extract daily data
+daily_data = data['data']
+
+# Create a list to hold state-wise records
+regional_records = []
+
+# Loop through each day's data
+for entry in daily_data:
+    date = entry['day']
+    for state in entry['regional']:
+        record = state.copy()
+        record['day'] = date  # add the date to each state record
+        regional_records.append(record)
+
+# Convert to DataFrame
+df_regional = pd.DataFrame(regional_records)
+
+# Convert date column to datetime
+df_regional['day'] = pd.to_datetime(df_regional['day'])
+
+# Sort by location and day
+df_regional = df_regional.sort_values(['loc', 'day']).reset_index(drop=True)
+
+# Calculate daily values from cumulative columns
+df_regional['dailyConfirmed'] = df_regional.groupby('loc')['totalConfirmed'].diff().fillna(0).astype(int)
+df_regional['dailyDischarged'] = df_regional.groupby('loc')['discharged'].diff().fillna(0).astype(int)
+df_regional['dailyDeaths'] = df_regional.groupby('loc')['deaths'].diff().fillna(0).astype(int)
+
+# View result
+print(df_regional[['day', 'loc', 'totalConfirmed', 'dailyConfirmed', 'discharged', 'dailyDischarged', 'deaths', 'dailyDeaths']].head(15))
+</Script>
+  <Language>Python</Language>
+  <Output>
+    <Name>df_regional</Name>
+    <Type>Table</Type>
+    <DisplayName>df_regional</DisplayName>
+    <Description />
+  </Output>
+  <Description />
+  <AllowCaching>false</AllowCaching>
+  <ApprovalStamp>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAAIq89t7N5kCviLOkxSWqqgAAAAACAAAAAAAQZgAAAAEAACAAAAB/bYYk0mWzLQhOt29KSDGp4FLz3gHpKySL2ZfaLnkSCgAAAAAOgAAAAAIAACAAAAA4ykkUHSFs1xnQf69MoXqDqej/MJ6vD+9Bwg18IfnpvpAAAADXMUL8JZuPZSvvNr7RlsIfGQQZ29CpcIsRJ3XDvVlp5R3BK+yOyWIZCUzIDTqJJjCJXDubagX40L5f8vKXZuM/YcSmoww/CzUv0exKewg0ReaOBPErkcaXGHu8dmJl9Q2VR4UAK2BAeXcdwkqvdHv0u0+diNzsElgZIX7CrUhaiQQWqUa4ANHrlGJsZY4w7w1AAAAAGL8TA/NEtiKqMLv2V57g7d0cOZccdUq7l3wsFGgygOufFs31QIaqGrLb9F1olP9K/CTQrXVgvhmaJdwQM4Yzpw==</ApprovalStamp>
+  <AdditionalApprovalStamps />
+  <Category>default</Category>
+</ScriptFunctionDefinition>

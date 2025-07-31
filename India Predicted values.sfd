@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<ScriptFunctionDefinition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Version Major="1" Minor="0" />
+  <Name>India Predicted values</Name>
+  <Script>import requests
+import pandas as pd 
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from datetime import timedelta
+
+# Fetch and prepare data
+url = "https://api.rootnet.in/covid19-in/stats/history"
+response = requests.get(url)
+data = response.json()
+
+# Extract and flatten data
+regional_records = []
+for entry in data['data']: 
+    date = entry['day']
+    for state in entry['regional']:
+        record = state.copy()
+        record['day'] = date
+        regional_records.append(record)
+
+# Create DataFrame
+df = pd.DataFrame(regional_records)
+df['day'] = pd.to_datetime(df['day'])
+df = df.sort_values(['loc', 'day']).reset_index(drop=True)
+
+# Calculate daily metrics
+df['dailyConfirmed'] = df.groupby('loc')['totalConfirmed'].diff().fillna(0).astype(int)
+df['dailyDischarged'] = df.groupby('loc')['discharged'].diff().fillna(0).astype(int)
+df['dailyDeaths'] = df.groupby('loc')['deaths'].diff().fillna(0).astype(int)
+
+# Filter training data: June 2021
+train_df = df[(df['day'] &gt;= '2021-06-01') &amp; (df['day'] &lt;= '2021-06-30')].copy()
+
+# Combine future dates: July and Oct 15 – Nov 11
+future_dates = pd.date_range(start='2021-07-01', end='2021-07-31').tolist() + \
+               pd.date_range(start='2021-10-15', end='2021-11-11').tolist()
+
+predicted_records = []
+
+# Loop per state
+for state in train_df['loc'].unique():
+    state_data = train_df[train_df['loc'] == state].copy()
+
+    # Convert date to ordinal for regression
+    state_data['day_num'] = state_data['day'].map(lambda x: x.toordinal())
+
+    X = state_data[['day_num']]
+
+    # Train separate models
+    model_c = LinearRegression().fit(X, state_data['dailyConfirmed'])
+    model_d = LinearRegression().fit(X, state_data['dailyDischarged'])
+    model_death = LinearRegression().fit(X, state_data['dailyDeaths'])
+
+    for date in future_dates:
+        day_num = date.toordinal()
+
+        pred_confirmed = max(0, int(model_c.predict([[day_num]])[0]))
+        pred_discharged = max(0, int(model_d.predict([[day_num]])[0]))
+        pred_deaths = max(0, int(model_death.predict([[day_num]])[0]))
+
+        predicted_records.append({
+            'day': date,
+            'loc': state,
+            'pred_dailyConfirmed': pred_confirmed,
+            'pred_dailyDischarged': pred_discharged,
+            'pred_dailyDeaths': pred_deaths
+        })
+
+# Create final DataFrame
+predicted_df = pd.DataFrame(predicted_records)
+predicted_df = predicted_df.sort_values(['loc', 'day']).reset_index(drop=True)
+
+# Output for Spotfire
+output = predicted_df
+output
+</Script>
+  <Language>Python</Language>
+  <Output>
+    <Name>output</Name>
+    <Type>Table</Type>
+    <DisplayName>Output</DisplayName>
+    <Description />
+  </Output>
+  <Description>Covid19 India Predicted values</Description>
+  <ApprovalStamp>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAAIq89t7N5kCviLOkxSWqqgAAAAACAAAAAAAQZgAAAAEAACAAAABOdILBm1MQ+WBSBhNtHrueoJY4AMiH7uWsjElF7uOosAAAAAAOgAAAAAIAACAAAABLd+X2MXdTeZ1E6VAEsjHuv36GMDaSA2aNAByPV5aEspAAAACS0631XPhHEeizcqENybMjNCmpHzelChax5us3kuxM+b1kuaFkOppVteoPy0D48gFVD8NINPrnW4/brcWM4i2Ggqk3fGq6498RVfyP1C+DBCVRPH0i/31+mIgji2Oi+jwVlmJMPj7ijvN2mUWSHhKvCADS+YLcxtX5EXQWu0Ruue3VRa6w4GOuGJlg461Y0NFAAAAAGi4Y2b9aJkzQqjNCPQtqAApPWezZe4Hhg8BFn2KtbYzpALnP28MKX3qKvWlFYVN2Yypmo6oV0bXJgTZ6cZ2gYA==</ApprovalStamp>
+  <AdditionalApprovalStamps />
+  <Category>default</Category>
+</ScriptFunctionDefinition>

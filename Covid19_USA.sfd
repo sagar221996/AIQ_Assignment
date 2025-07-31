@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<ScriptFunctionDefinition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Version Major="1" Minor="0" />
+  <Name>Covid19_USA</Name>
+  <Script>import requests
+import pandas as pd
+
+# API endpoint for all states historical data
+url = "https://api.covidtracking.com/v1/states/daily.json"
+
+response = requests.get(url)
+response.raise_for_status()
+data = response.json()
+
+df = pd.DataFrame(data)
+df['recoveredIncrease'] = df.groupby('state')['recovered'].diff().fillna(0)
+
+# Convert date integer (YYYYMMDD) into datetime
+df['date'] = pd.to_datetime(df['date'], format='%Y%m%d')
+df = df.drop(columns=['dataQualityGrade'])
+# Optional: sort
+df_USA = df.sort_values(['state', 'date'])
+df_USA['recoveredIncrease'] = df_USA.groupby('state')['recovered'].diff().fillna(0)
+
+print(df.head())
+print(df.tail())</Script>
+  <Language>Python</Language>
+  <Output>
+    <Name>df_USA</Name>
+    <Type>Table</Type>
+    <DisplayName>df_USA</DisplayName>
+    <Description />
+  </Output>
+  <Description />
+  <ApprovalStamp>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAAIq89t7N5kCviLOkxSWqqgAAAAACAAAAAAAQZgAAAAEAACAAAADZrZZ9u4k1slXsIIy3aJaO5FpdG/MdR4NAFHJZ1+6YOgAAAAAOgAAAAAIAACAAAAA6fzhq37YsGnuVl/jXCMjUU0mKy5EZioRknwtTB2vwIpAAAAB9SntT+J3Ai/X4QnxSkAM4qWKXg7raycfDftPtUMME2Pux0dKqS3g4sxYrf7Uswp0EPMRJFduNglbcwJ1UsL4rYMJ3z5FjDeNvNsZaYwkA+mLuKkGLJpIsSLynOubtpEmnyOiIJS/2uC7CSc3540rFMrvSnv4ZoYI8gU821Wdz6S3ay/ENFHvX6SG60pcLpNFAAAAAgKwAsV+Lc5/vgovSpdz1EmwQIvGc8ujzYBtx/rqqetChQ+4qpiTB0lz0beJKE6Q0nQUXstzzNnaq+1Z3G+KI1g==</ApprovalStamp>
+  <AdditionalApprovalStamps />
+  <Category>default</Category>
+</ScriptFunctionDefinition>

@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<ScriptFunctionDefinition xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Version Major="1" Minor="0" />
+  <Name>Location Api</Name>
+  <Script># Import required libraries
+import requests
+import pandas as pd
+
+location_df=pd.DataFrame()
+print(location_test)
+
+#locations=location_test.iloc[0]#['edinburgh','london']
+locations=[city.strip() for city in location_test.split(',')]
+#locations.tolist()
+
+print("locations",locations)
+
+for location in locations:
+  # Define the API endpoint 
+  url1 = f"http://api.openweathermap.org/geo/1.0/direct?q={location}&amp;limit=1&amp;appid=762e06ca1b8bfb13af5c2cac28d8bed0"
+
+
+
+  try:
+      # Fetch data from the API
+      response1 = requests.get(url1)
+      response1.raise_for_status()  # Raise error for HTTP issues
+      
+      # Parse JSON response
+      data1 = response1.json()
+      
+      #extract relevant weather attributes
+      #temperature=[item['main']['temp'] for item in data['list']]
+      #humidity=[item['main']['humidity'] for item in data['list']]
+      
+      # Convert JSON data to DataFrame
+      df1 = pd.DataFrame(data1)
+      location_df=location_df._append(df1)
+      
+  except requests.exceptions.RequestException as e:
+      # Handle request errors and return an empty DataFrame
+      df1 = pd.DataFrame()
+      print(f"Error fetching data: {e}")
+
+  # Define the output for Spotfire
+  # SPOTFIRE_OUTPUT
+output1 = location_df[['name','lat','lon','country','state']]
+</Script>
+  <Language>Python</Language>
+  <Input>
+    <Name>location_test</Name>
+    <Type>Value</Type>
+    <DisplayName>location</DisplayName>
+    <Description />
+    <AllowedDataType>Integer</AllowedDataType>
+    <AllowedDataType>Double</AllowedDataType>
+    <AllowedDataType>Float</AllowedDataType>
+    <AllowedDataType>Decimal</AllowedDataType>
+    <AllowedDataType>String</AllowedDataType>
+    <AllowedDataType>Date</AllowedDataType>
+    <AllowedDataType>Time</AllowedDataType>
+    <AllowedDataType>DateTime</AllowedDataType>
+    <AllowedDataType>Bool</AllowedDataType>
+    <AllowedDataType>Binary</AllowedDataType>
+    <AllowedDataType>Long</AllowedDataType>
+  </Input>
+  <Output>
+    <Name>output1</Name>
+    <Type>Table</Type>
+    <DisplayName>output1</DisplayName>
+    <Description />
+  </Output>
+  <Description />
+  <ApprovalStamp>AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAAIq89t7N5kCviLOkxSWqqgAAAAACAAAAAAAQZgAAAAEAACAAAABiNpGZk6pK/TgzH5/1vsCV1Izkl9SjhnxSE8lbgwMylgAAAAAOgAAAAAIAACAAAACoc0frdATuln2QtVmyJJ4Are/ogjKUVMuUKPWuYwNMJZAAAACPT2JKLXIr26rW6i/+/nLC97uBj4p/nA7IRWSVUjN1ajC42zARHgL+S/kxGaGLk+4MvxJd2L0SbHSi8hUCWBW8jlNOsVqJInOlfG58GXhwgnDP7zBAVV8YwAqDK+aRVaLhqSJ/UVMJVQlnlQFeBranW8wgWHMpKJcS2yTa25aZ89JTd4ZI0Fg8vhc3DA0PoJ9AAAAA3zJyEM8SigkT2etUWFX53EAK9mgccSe9sp23PIhiKr+2wf9udMyW60URMFd6uWWsuEcCNP1S6l3ezb+1vRIXpg==</ApprovalStamp>
+  <AdditionalApprovalStamps />
+  <Category>default</Category>
+</ScriptFunctionDefinition>
